@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NoteApp</string>
+    <string name="my_notes">Мои заметки</string>
+    <string name="search_notes">Поиск заметок</string>
+    <string name="note_title">Имя заметки</string>
+    <string name="note_subtitle">Тема заметки</string>
+    <string name="type_note_here">Напиши заметку здесь...</string>
+</resources>
