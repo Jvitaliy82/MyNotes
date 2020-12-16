@@ -9,7 +9,7 @@ import java.io.Serializable
 data class Note (
 
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Int? = null,
 
     @ColumnInfo(name = "title")
     val title: String,
@@ -24,13 +24,13 @@ data class Note (
     val noteText: String,
 
     @ColumnInfo(name = "image_path")
-    val imagePath: String,
+    val imagePath: String = "",
 
     @ColumnInfo(name = "color")
-    val color: String,
+    val color: String = "",
 
     @ColumnInfo(name = "web_link")
-    val webLink: String
+    val webLink: String = ""
 ) : Serializable {
     override fun toString(): String {
         return "$title : $dateTime"

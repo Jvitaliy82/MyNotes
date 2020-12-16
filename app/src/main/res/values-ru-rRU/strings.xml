@@ -6,4 +6,6 @@
     <string name="note_title">Имя заметки</string>
     <string name="note_subtitle">Тема заметки</string>
     <string name="type_note_here">Напиши заметку здесь...</string>
+    <string name="title_is_empty">Имя не может быть пустым</string>
+    <string name="note_is_empty">Заметка не может быть пустой</string>
 </resources>
