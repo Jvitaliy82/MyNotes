@@ -27,7 +27,7 @@ data class Note (
     val imagePath: String = "",
 
     @ColumnInfo(name = "color")
-    val color: String = "",
+    val color: String,
 
     @ColumnInfo(name = "web_link")
     val webLink: String = ""

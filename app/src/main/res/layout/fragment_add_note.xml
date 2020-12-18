@@ -12,6 +12,7 @@
         android:background="@color/colorPrimary">
 
         <ScrollView
+            android:id="@+id/scrollView2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="@dimen/_40sdp"
@@ -139,6 +140,10 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </ScrollView>
+
+        <include
+            android:id="@+id/includeMiscellaneous"
+            layout="@layout/layout_miscellaneous" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

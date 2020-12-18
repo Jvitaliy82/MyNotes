@@ -8,4 +8,6 @@
     <string name="type_note_here">Напиши заметку здесь...</string>
     <string name="title_is_empty">Имя не может быть пустым</string>
     <string name="note_is_empty">Заметка не может быть пустой</string>
+    <string name="miscellaneous">Разное</string>
+    <string name="pick_color">цвет заметки</string>
 </resources>

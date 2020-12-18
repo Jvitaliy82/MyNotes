@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <import type="android.graphics.Color"/>
         <variable
             name="noteItem"
             type="com.jdeveloperapps.noteapp.entities.Note" />
@@ -16,6 +16,7 @@
         android:layout_marginStart="@dimen/_12sdp"
         android:layout_marginTop="@dimen/_12sdp"
         android:background="@drawable/background_note"
+        android:colorBackground="@{noteItem.color}"
         android:orientation="vertical">
 
         <TextView
