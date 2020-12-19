@@ -1,5 +1,8 @@
 package com.jdeveloperapps.noteapp.ui.fragments
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -10,30 +13,37 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jdeveloperapps.noteapp.R
 import com.jdeveloperapps.noteapp.databinding.FragmentAddNoteBinding
-import com.jdeveloperapps.noteapp.databinding.LayoutMiscellaneousBinding
 import com.jdeveloperapps.noteapp.entities.Note
+import com.jdeveloperapps.noteapp.utilites.Constants
 import com.jdeveloperapps.noteapp.viewModels.MainViewModel
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_add_note.*
+import pub.devrel.easypermissions.AppSettingsDialog
+import pub.devrel.easypermissions.EasyPermissions
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 @AndroidEntryPoint
-class AddNoteFragment : Fragment() {
+class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private var _binding: FragmentAddNoteBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: MainViewModel
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private lateinit var selectedNoteColor: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentAddNoteBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -46,7 +56,10 @@ class AddNoteFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        binding.textDateTime.text = SimpleDateFormat("EEE, dd MMMM yyyy HH:hh a", Locale.getDefault())
+        binding.textDateTime.text = SimpleDateFormat(
+            "EEE, dd MMMM yyyy HH:hh a",
+            Locale.getDefault()
+        )
             .format(Date())
 
         binding.imageSave.setOnClickListener {
@@ -118,15 +131,28 @@ class AddNoteFragment : Fragment() {
             }
             setSubtitleIndicatorColor()
         }
+
+        binding.includeMiscellaneous.layoutAddImage.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            getImageForNote()
+        }
     }
 
-    fun saveNote() {
+    private fun saveNote() {
         if (inputNoteTitle.text.toString().trim().isEmpty()) {
-            Toast.makeText(requireContext(), resources.getString(R.string.title_is_empty), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                resources.getString(R.string.title_is_empty),
+                Toast.LENGTH_SHORT
+            ).show()
             return
         } else if (inputNodeSubtitle.text.toString().trim().isEmpty() &&
             inputNote.text.toString().trim().isEmpty()) {
-            Toast.makeText(requireContext(), resources.getString(R.string.title_is_empty), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                resources.getString(R.string.title_is_empty),
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
@@ -141,9 +167,9 @@ class AddNoteFragment : Fragment() {
         viewModel.saveNote(note = note)
     }
 
-    fun initMiscellaneous() {
+    private fun initMiscellaneous() {
         val layoutMiscellaneous = binding.includeMiscellaneous.layoutMiscellaneous
-        val bottomSheetBehavior = BottomSheetBehavior.from(layoutMiscellaneous)
+        bottomSheetBehavior = BottomSheetBehavior.from(layoutMiscellaneous)
         binding.includeMiscellaneous.textMiscellaneous.setOnClickListener {
             if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -158,9 +184,69 @@ class AddNoteFragment : Fragment() {
         gradientDrawable.setColor(Color.parseColor(selectedNoteColor))
     }
 
+    private fun getImageForNote() {
+        if (hasPermissions()) {
+            CropImage.activity()
+                .setAspectRatio(1, 1)
+                .setRequestedSize(400, 400)
+                .setCropShape(CropImageView.CropShape.RECTANGLE)
+                .start(requireActivity(), this)
+        } else {
+            requestPermission()
+        }
+    }
+
+    private fun hasPermissions(): Boolean {
+        return EasyPermissions.hasPermissions(
+            requireContext(),
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+    }
+
+    private fun requestPermission() {
+        EasyPermissions.requestPermissions(
+            this,
+            requireContext().resources.getString(R.string.require_permission_read_storage),
+            Constants.REQUEST_CODE_READ_EXTERNAL_STORAGE_PERMISSIONS,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE
+            && resultCode == Activity.RESULT_OK && data != null
+        ) {
+            val uri = CropImage.getActivityResult(data).uri
+            binding.imageNote.apply {
+                load(uri)
+                visibility = View.VISIBLE
+            }
+        }
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+        getImageForNote()
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this).build().show()
+        }
+        Toast.makeText(requireContext(), "Извините дальше никак", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }
-
 }

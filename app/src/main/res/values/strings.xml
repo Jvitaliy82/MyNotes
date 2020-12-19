@@ -9,4 +9,6 @@
     <string name="note_is_empty">Note can`t be empty</string>
     <string name="miscellaneous">Miscellaneous</string>
     <string name="pick_color">pick_color</string>
+    <string name="add_image">add image</string>
+    <string name="require_permission_read_storage">you need to accept read storage permissions to use this function.</string>
 </resources>

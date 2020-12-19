@@ -10,4 +10,6 @@
     <string name="note_is_empty">Заметка не может быть пустой</string>
     <string name="miscellaneous">Разное</string>
     <string name="pick_color">цвет заметки</string>
+    <string name="add_image">добавить картинку</string>
+    <string name="require_permission_read_storage">Вам нужно дать разрешение на чтения хранилища файлов для использования этой функции.</string>
 </resources>
