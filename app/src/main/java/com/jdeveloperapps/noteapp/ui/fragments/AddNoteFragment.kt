@@ -5,7 +5,9 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,8 +22,6 @@ import com.jdeveloperapps.noteapp.databinding.FragmentAddNoteBinding
 import com.jdeveloperapps.noteapp.entities.Note
 import com.jdeveloperapps.noteapp.utilites.Constants
 import com.jdeveloperapps.noteapp.viewModels.MainViewModel
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_add_note.*
 import pub.devrel.easypermissions.AppSettingsDialog
@@ -33,11 +33,14 @@ import java.util.*
 @AndroidEntryPoint
 class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
+    private val GALLERY_REQUEST = 1
+
     private var _binding: FragmentAddNoteBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: MainViewModel
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private lateinit var selectedNoteColor: String
+    private var imagePath: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -147,7 +150,8 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             ).show()
             return
         } else if (inputNodeSubtitle.text.toString().trim().isEmpty() &&
-            inputNote.text.toString().trim().isEmpty()) {
+            inputNote.text.toString().trim().isEmpty()
+        ) {
             Toast.makeText(
                 requireContext(),
                 resources.getString(R.string.title_is_empty),
@@ -161,7 +165,8 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             subtitle = binding.inputNodeSubtitle.text.toString(),
             noteText = binding.inputNote.text.toString(),
             dateTime = binding.textDateTime.text.toString(),
-            color = selectedNoteColor
+            color = selectedNoteColor,
+            imagePath = imagePath ?: ""
         )
 
         viewModel.saveNote(note = note)
@@ -186,11 +191,12 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private fun getImageForNote() {
         if (hasPermissions()) {
-            CropImage.activity()
-                .setAspectRatio(1, 1)
-                .setRequestedSize(400, 400)
-                .setCropShape(CropImageView.CropShape.RECTANGLE)
-                .start(requireActivity(), this)
+            val photoPickerIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            activity?.let {
+                if (photoPickerIntent.resolveActivity(it.packageManager) != null) {
+                    startActivityForResult(photoPickerIntent, GALLERY_REQUEST)
+                }
+            }
         } else {
             requestPermission()
         }
@@ -214,15 +220,28 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE
-            && resultCode == Activity.RESULT_OK && data != null
-        ) {
-            val uri = CropImage.getActivityResult(data).uri
-            binding.imageNote.apply {
-                load(uri)
-                visibility = View.VISIBLE
+        if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            val selectedImage: Uri? = data.data
+            selectedImage?.let {
+                imagePath = getPathFromUri(it)
+                binding.imageNote.load(it)
+                binding.imageNote.visibility = View.VISIBLE
             }
         }
+    }
+
+    private fun getPathFromUri(contentUri: Uri): String {
+        var filePath = ""
+        var cursor = activity?.contentResolver?.query(contentUri, null, null, null, null)
+        if (cursor == null) {
+            filePath = contentUri.path.toString()
+        } else {
+            cursor.moveToFirst()
+            val index = cursor.getColumnIndex("_data")
+            filePath = cursor.getString(index)
+            cursor.close()
+        }
+        return filePath
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
