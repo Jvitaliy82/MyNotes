@@ -2,16 +2,22 @@ package com.jdeveloperapps.noteapp.ui.fragments
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -28,6 +34,7 @@ import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 
 @AndroidEntryPoint
@@ -41,6 +48,8 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private lateinit var selectedNoteColor: String
     private var imagePath: String? = null
+
+    private var dialogAddUrl: AlertDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -139,6 +148,11 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             getImageForNote()
         }
+
+        binding.includeMiscellaneous.layoutAddUrl.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            showAddUrlDialog()
+        }
     }
 
     private fun saveNote() {
@@ -166,7 +180,8 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             noteText = binding.inputNote.text.toString(),
             dateTime = binding.textDateTime.text.toString(),
             color = selectedNoteColor,
-            imagePath = imagePath ?: ""
+            imagePath = imagePath ?: "",
+            webLink = binding.textWebUrl.text.toString() ?: ""
         )
 
         viewModel.saveNote(note = note)
@@ -191,7 +206,8 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private fun getImageForNote() {
         if (hasPermissions()) {
-            val photoPickerIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            val photoPickerIntent =
+                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             activity?.let {
                 if (photoPickerIntent.resolveActivity(it.packageManager) != null) {
                     startActivityForResult(photoPickerIntent, GALLERY_REQUEST)
@@ -242,6 +258,51 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             cursor.close()
         }
         return filePath
+    }
+
+    private fun showAddUrlDialog() {
+        if (dialogAddUrl == null) {
+            val builder = AlertDialog.Builder(requireContext())
+            val view = LayoutInflater.from(requireContext())
+                .inflate(
+                    R.layout.layout_add_url,
+                    activity?.findViewById<ConstraintLayout>(R.id.layoutAddUrlContainer)
+                )
+            builder.setView(view)
+            dialogAddUrl = builder.create()
+            dialogAddUrl?.let { dialog ->
+                dialog.window?.setBackgroundDrawable(ColorDrawable(0))
+
+                val inputUrl = view.findViewById<EditText>(R.id.inputUrl)
+                inputUrl.requestFocus()
+
+                view.findViewById<TextView>(R.id.textAdd).setOnClickListener {
+                    if (inputUrl.text.toString().trim().isEmpty()) {
+                        Toast.makeText(
+                            requireContext(),
+                            resources.getString(R.string.enter_url),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else if (!Patterns.WEB_URL.matcher(inputUrl.text.toString()).matches()) {
+                        Toast.makeText(
+                            requireContext(),
+                            resources.getString(R.string.enter_valid_url),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        textWebUrl.text = inputUrl.text.toString()
+                        layoutWebUrl.visibility = View.VISIBLE
+                        dialog.dismiss()
+                    }
+                }
+
+                view.findViewById<TextView>(R.id.textCancel).setOnClickListener {
+                    dialog.dismiss()
+                }
+
+            }
+        }
+        dialogAddUrl?.show()
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {

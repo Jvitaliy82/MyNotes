@@ -12,4 +12,9 @@
     <string name="pick_color">цвет заметки</string>
     <string name="add_image">добавить картинку</string>
     <string name="require_permission_read_storage">Вам нужно дать разрешение на чтения хранилища файлов для использования этой функции.</string>
+    <string name="add_url">Добавить URL</string>
+    <string name="enter_url">введите URL</string>
+    <string name="enter_valid_url">Введите правильный URL</string>
+    <string name="add">Добавить</string>
+    <string name="cancel">Отменить</string>
 </resources>
