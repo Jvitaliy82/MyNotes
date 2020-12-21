@@ -12,25 +12,25 @@ data class Note (
     val id: Int? = null,
 
     @ColumnInfo(name = "title")
-    val title: String,
+    var title: String = "",
 
     @ColumnInfo(name = "date_time")
-    val dateTime: String,
+    var dateTime: String = "",
 
     @ColumnInfo(name = "subtitle")
-    val subtitle: String,
+    var subtitle: String = "",
 
     @ColumnInfo(name = "note_text")
-    val noteText: String,
+    var noteText: String = "",
 
     @ColumnInfo(name = "image_path")
-    val imagePath: String = "",
+    var imagePath: String = "",
 
     @ColumnInfo(name = "color")
-    val color: String,
+    var color: String = "#333333",
 
     @ColumnInfo(name = "web_link")
-    val webLink: String = ""
+    var webLink: String = ""
 ) : Serializable {
     override fun toString(): String {
         return "$title : $dateTime"

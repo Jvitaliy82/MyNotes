@@ -1,6 +1,7 @@
 package com.jdeveloperapps.noteapp.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -12,7 +13,14 @@ import com.jdeveloperapps.noteapp.entities.Note
 
 class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
 
-    class NotesViewHolder(val binding: ItemContainerNoteBinding) : RecyclerView.ViewHolder(binding.root)
+    private var onItemClickListener: ((note: Note) -> Unit)? = null
+
+    class NotesViewHolder(val binding: ItemContainerNoteBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    fun setOnClickListener(listener: (note: Note) -> Unit) {
+        onItemClickListener = listener
+    }
 
     private val differCallback = object : DiffUtil.ItemCallback<Note>() {
         override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
@@ -37,6 +45,11 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
         val currentItem = differ.currentList[position]
         holder.binding.apply {
             noteItem = currentItem
+            root.setOnClickListener {
+                onItemClickListener?.let {
+                    it(currentItem)
+                }
+            }
         }
     }
 

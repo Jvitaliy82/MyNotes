@@ -20,7 +20,9 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavArgs
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jdeveloperapps.noteapp.R
@@ -41,15 +43,18 @@ import java.util.regex.Pattern
 class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private val GALLERY_REQUEST = 1
+    private val CURRENT_NOTE = "currentNote"
 
     private var _binding: FragmentAddNoteBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: MainViewModel
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private lateinit var selectedNoteColor: String
-    private var imagePath: String? = null
 
     private var dialogAddUrl: AlertDialog? = null
+
+    private val args: AddNoteFragmentArgs by navArgs()
+    private lateinit var currentNote: Note
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,6 +69,13 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
+        savedInstanceState?.let {
+            currentNote = it.getSerializable(CURRENT_NOTE) as Note
+        }
+        currentNote = args.note ?: Note()
+
+        binding.note = currentNote
+
         binding.imageBack.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -75,13 +87,64 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             .format(Date())
 
         binding.imageSave.setOnClickListener {
-            saveNote()
-            findNavController().popBackStack()
+            if (saveNote()) {
+                findNavController().popBackStack()
+            }
         }
 
-        selectedNoteColor = "#333333"
+        selectedNoteColor = currentNote.color
+
         initMiscellaneous()
-        setSubtitleIndicatorColor()
+    }
+
+    private fun saveNote(): Boolean {
+        if (inputNoteTitle.text.toString().trim().isEmpty()) {
+            Toast.makeText(
+                requireContext(),
+                resources.getString(R.string.title_is_empty),
+                Toast.LENGTH_SHORT
+            ).show()
+            return false
+        } else if (inputNodeSubtitle.text.toString().trim().isEmpty() &&
+            inputNote.text.toString().trim().isEmpty()
+        ) {
+            Toast.makeText(
+                requireContext(),
+                resources.getString(R.string.title_is_empty),
+                Toast.LENGTH_SHORT
+            ).show()
+            return false
+        }
+
+        updateCurrentNote()
+
+        viewModel.saveNote(note = currentNote)
+        return true
+
+    }
+
+    private fun updateCurrentNote() {
+        currentNote.apply {
+            title = binding.inputNoteTitle.text.toString()
+            subtitle = binding.inputNodeSubtitle.text.toString()
+            noteText = binding.inputNote.text.toString()
+            dateTime = binding.textDateTime.text.toString()
+            color = selectedNoteColor
+            imagePath = imagePath ?: ""
+            webLink = binding.textWebUrl.text.toString() ?: ""
+        }
+    }
+
+    private fun initMiscellaneous() {
+        val layoutMiscellaneous = binding.includeMiscellaneous.layoutMiscellaneous
+        bottomSheetBehavior = BottomSheetBehavior.from(layoutMiscellaneous)
+        binding.includeMiscellaneous.textMiscellaneous.setOnClickListener {
+            if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
 
         binding.includeMiscellaneous.imageColor1.setOnClickListener {
             selectedNoteColor = "#333333"
@@ -92,7 +155,6 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                 imageColor4.setImageResource(0)
                 imageColor5.setImageResource(0)
             }
-
             setSubtitleIndicatorColor()
         }
 
@@ -153,55 +215,18 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             showAddUrlDialog()
         }
-    }
 
-    private fun saveNote() {
-        if (inputNoteTitle.text.toString().trim().isEmpty()) {
-            Toast.makeText(
-                requireContext(),
-                resources.getString(R.string.title_is_empty),
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        } else if (inputNodeSubtitle.text.toString().trim().isEmpty() &&
-            inputNote.text.toString().trim().isEmpty()
-        ) {
-            Toast.makeText(
-                requireContext(),
-                resources.getString(R.string.title_is_empty),
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-
-        val note = Note(
-            title = binding.inputNoteTitle.text.toString(),
-            subtitle = binding.inputNodeSubtitle.text.toString(),
-            noteText = binding.inputNote.text.toString(),
-            dateTime = binding.textDateTime.text.toString(),
-            color = selectedNoteColor,
-            imagePath = imagePath ?: "",
-            webLink = binding.textWebUrl.text.toString() ?: ""
-        )
-
-        viewModel.saveNote(note = note)
-    }
-
-    private fun initMiscellaneous() {
-        val layoutMiscellaneous = binding.includeMiscellaneous.layoutMiscellaneous
-        bottomSheetBehavior = BottomSheetBehavior.from(layoutMiscellaneous)
-        binding.includeMiscellaneous.textMiscellaneous.setOnClickListener {
-            if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
+        when (currentNote.color) {
+                "#FDBE3B" -> binding.includeMiscellaneous.imageColor2.performClick()
+                "#FF4842" -> binding.includeMiscellaneous.imageColor3.performClick()
+                "#3A52FC" -> binding.includeMiscellaneous.imageColor4.performClick()
+                "#000000" -> binding.includeMiscellaneous.imageColor5.performClick()
         }
     }
 
     private fun setSubtitleIndicatorColor() {
-        val gradientDrawable = binding.viewSubtitleIndicator.background as GradientDrawable
-        gradientDrawable.setColor(Color.parseColor(selectedNoteColor))
+        currentNote.color = selectedNoteColor
+        binding.invalidateAll()
     }
 
     private fun getImageForNote() {
@@ -239,9 +264,8 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage: Uri? = data.data
             selectedImage?.let {
-                imagePath = getPathFromUri(it)
-                binding.imageNote.load(it)
-                binding.imageNote.visibility = View.VISIBLE
+                currentNote.imagePath = getPathFromUri(it)
+                binding.invalidateAll()
             }
         }
     }
@@ -262,7 +286,7 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private fun showAddUrlDialog() {
         if (dialogAddUrl == null) {
-            val builder = AlertDialog.Builder(requireContext())
+            val builder = AlertDialog.Builder(requireContext(), R.style.AlertDialogTheme)
             val view = LayoutInflater.from(requireContext())
                 .inflate(
                     R.layout.layout_add_url,
@@ -323,6 +347,12 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        updateCurrentNote()
+        outState.putSerializable(CURRENT_NOTE, currentNote)
     }
 
     override fun onDestroy() {

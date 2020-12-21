@@ -42,7 +42,17 @@ class ListFragment : Fragment() {
 
         binding.notesRecyclerView.apply {
             setHasFixedSize(true)
-            adapter = notesAdapter
+            adapter = notesAdapter.apply {
+                setOnClickListener { note ->
+                    val bundle = Bundle().apply {
+                        putSerializable("note", note)
+                    }
+                    findNavController().navigate(
+                        R.id.action_listFragment_to_addNoteFragment,
+                        bundle
+                    )
+                }
+            }
         }
 
         viewModel.getSaveNotes().observe(viewLifecycleOwner, {
