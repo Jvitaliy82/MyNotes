@@ -92,6 +92,16 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             }
         }
 
+        binding.imageRemoveWebUrl.setOnClickListener {
+            currentNote.webLink = ""
+            binding.invalidateAll()
+        }
+
+        binding.imageRemoveImage.setOnClickListener {
+            currentNote.imagePath = ""
+            binding.invalidateAll()
+        }
+
         selectedNoteColor = currentNote.color
 
         initMiscellaneous()
