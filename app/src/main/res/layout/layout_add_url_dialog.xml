@@ -70,7 +70,7 @@
         android:textColor="@color/colorAccent"
         android:textSize="@dimen/_13ssp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/textCancel"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/inputUrl" />
 
     <TextView
@@ -86,7 +86,7 @@
         android:textColor="@color/colorAccent"
         android:textSize="@dimen/_13ssp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/textAdd"
         app:layout_constraintTop_toBottomOf="@id/inputUrl" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

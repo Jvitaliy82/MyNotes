@@ -16,5 +16,8 @@
     <string name="enter_valid_url">Enter valid URL</string>
     <string name="add">ADD</string>
     <string name="cancel">Cancel</string>
+    <string name="delete_note">Delete Note</string>
+    <string name="delete_note_question">Delete Note?</string>
+    <string name="delete">Delete</string>
 
 </resources>

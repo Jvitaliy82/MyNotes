@@ -4,9 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -20,10 +18,8 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavArgs
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jdeveloperapps.noteapp.R
 import com.jdeveloperapps.noteapp.databinding.FragmentAddNoteBinding
@@ -36,7 +32,6 @@ import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.regex.Pattern
 
 
 @AndroidEntryPoint
@@ -52,6 +47,7 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private lateinit var selectedNoteColor: String
 
     private var dialogAddUrl: AlertDialog? = null
+    private var dialogDeleteNote: AlertDialog? = null
 
     private val args: AddNoteFragmentArgs by navArgs()
     private lateinit var currentNote: Note
@@ -226,11 +222,16 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             showAddUrlDialog()
         }
 
+        binding.includeMiscellaneous.layoutDeleteNote.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            showDeleteNoteDialog()
+        }
+
         when (currentNote.color) {
-                "#FDBE3B" -> binding.includeMiscellaneous.imageColor2.performClick()
-                "#FF4842" -> binding.includeMiscellaneous.imageColor3.performClick()
-                "#3A52FC" -> binding.includeMiscellaneous.imageColor4.performClick()
-                "#000000" -> binding.includeMiscellaneous.imageColor5.performClick()
+            "#FDBE3B" -> binding.includeMiscellaneous.imageColor2.performClick()
+            "#FF4842" -> binding.includeMiscellaneous.imageColor3.performClick()
+            "#3A52FC" -> binding.includeMiscellaneous.imageColor4.performClick()
+            "#000000" -> binding.includeMiscellaneous.imageColor5.performClick()
         }
     }
 
@@ -299,7 +300,7 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             val builder = AlertDialog.Builder(requireContext(), R.style.AlertDialogTheme)
             val view = LayoutInflater.from(requireContext())
                 .inflate(
-                    R.layout.layout_add_url,
+                    R.layout.layout_add_url_dialog,
                     activity?.findViewById<ConstraintLayout>(R.id.layoutAddUrlContainer)
                 )
             builder.setView(view)
@@ -337,6 +338,34 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             }
         }
         dialogAddUrl?.show()
+    }
+
+    private fun showDeleteNoteDialog() {
+        if (dialogDeleteNote == null) {
+            val builder = AlertDialog.Builder(requireContext(), R.style.AlertDialogTheme)
+            val view = LayoutInflater.from(requireContext())
+                .inflate(
+                    R.layout.layout_delete_note_dialog,
+                    activity?.findViewById<ConstraintLayout>(R.id.layoutDeleteNoteContainer)
+                )
+            builder.setView(view)
+            dialogDeleteNote = builder.create()
+            dialogDeleteNote?.let { dialog ->
+                dialog.window?.setBackgroundDrawable(ColorDrawable(0))
+
+                view.findViewById<TextView>(R.id.textDelete).setOnClickListener {
+                    viewModel.deleteNote(currentNote)
+                    dialog.dismiss()
+                    findNavController().popBackStack()
+                }
+
+                view.findViewById<TextView>(R.id.textCancel).setOnClickListener {
+                    dialog.dismiss()
+                }
+
+            }
+        }
+        dialogDeleteNote?.show()
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {

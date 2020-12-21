@@ -12,4 +12,8 @@ class MainRepository @Inject constructor(val db: NoteDao) {
 
     fun getSaveNotes() = db.getAll()
 
+    suspend fun deleteNote(note: Note) {
+        db.deleteNote(note)
+    }
+
 }

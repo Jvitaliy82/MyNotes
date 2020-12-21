@@ -17,4 +17,8 @@ class MainViewModel @ViewModelInject constructor(
 
     fun getSaveNotes() = repository.getSaveNotes()
 
+    fun deleteNote(note: Note) = viewModelScope.launch {
+        repository.deleteNote(note)
+    }
+
 }

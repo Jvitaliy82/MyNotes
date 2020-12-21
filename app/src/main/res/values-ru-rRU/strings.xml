@@ -17,4 +17,7 @@
     <string name="enter_valid_url">Введите правильный URL</string>
     <string name="add">Добавить</string>
     <string name="cancel">Отменить</string>
+    <string name="delete_note">Удалить заметку</string>
+    <string name="delete_note_question">Удалить заметку?</string>
+    <string name="delete">Удалить</string>
 </resources>
