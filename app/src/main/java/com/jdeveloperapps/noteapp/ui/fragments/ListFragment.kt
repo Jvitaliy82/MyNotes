@@ -1,6 +1,8 @@
 package com.jdeveloperapps.noteapp.ui.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +14,6 @@ import com.jdeveloperapps.noteapp.adapters.NotesAdapter
 import com.jdeveloperapps.noteapp.databinding.FragmentListBinding
 import com.jdeveloperapps.noteapp.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_list.*
 
 @AndroidEntryPoint
 class ListFragment : Fragment() {
@@ -27,7 +28,7 @@ class ListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -36,7 +37,7 @@ class ListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        imageAddNoteMain.setOnClickListener {
+        binding.imageAddNoteMain.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_addNoteFragment)
         }
 
@@ -56,8 +57,30 @@ class ListFragment : Fragment() {
         }
 
         viewModel.getSaveNotes().observe(viewLifecycleOwner, {
-            notesAdapter.differ.submitList(it)
+            notesAdapter.submitList(it)
+            binding.inputSearch.text?.let { searchText ->
+                notesAdapter.filter.filter(searchText.toString())
+            }
         })
+
+        binding.inputSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                charSequence?.let {
+                    notesAdapter.filter.filter(it)
+                }
+            }
+
+            override fun afterTextChanged(searchText: Editable?) {
+
+            }
+        })
+
+
+
     }
 
     override fun onDestroy() {

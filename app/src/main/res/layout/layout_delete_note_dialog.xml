@@ -26,8 +26,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
         android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
         android:layout_marginBottom="@dimen/_10sdp"
         android:fontFamily="@font/ubuntu_bold"
         android:gravity="center_horizontal"
@@ -35,10 +35,10 @@
         android:text="@string/delete_note_question"
         android:textColor="@color/white"
         android:textSize="@dimen/_14ssp"
+        app:layout_constraintBottom_toTopOf="@id/textDelete"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/imageDeleteNote"
-        app:layout_constraintTop_toBottomOf="@id/imageDeleteNote"
-        app:layout_constraintBottom_toTopOf="@id/textDelete"/>
+        app:layout_constraintTop_toBottomOf="@id/imageDeleteNote" />
 
     <TextView
         android:id="@+id/textDelete"
@@ -49,12 +49,13 @@
         android:includeFontPadding="false"
         android:padding="@dimen/_8sdp"
         android:text="@string/delete"
-        android:textColor="@color/colorAccent"
+        android:textAllCaps="true"
+        android:textColor="@color/colorDelete"
         android:textSize="@dimen/_13ssp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textDeleteNote"
-        app:layout_constraintStart_toEndOf="@id/textCancel"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/textCancel"
+        app:layout_constraintTop_toBottomOf="@id/textDeleteNote" />
 
     <TextView
         android:id="@+id/textCancel"
@@ -66,11 +67,12 @@
         android:includeFontPadding="false"
         android:padding="@dimen/_8sdp"
         android:text="@string/cancel"
+        android:textAllCaps="true"
         android:textColor="@color/colorAccent"
         android:textSize="@dimen/_13ssp"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="@id/textDelete"
-        app:layout_constraintEnd_toStartOf="@id/textDelete"/>
+        app:layout_constraintEnd_toStartOf="@id/textDelete"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/textDelete" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
