@@ -65,22 +65,23 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
+
+        currentNote = args.note ?: Note().apply {
+            dateTime = SimpleDateFormat(
+                "EEE, dd MMMM yyyy HH:mm",
+                Locale.getDefault()
+            ).format(Date())
+        }
+
         savedInstanceState?.let {
             currentNote = it.getSerializable(CURRENT_NOTE) as Note
         }
-        currentNote = args.note ?: Note()
 
         binding.note = currentNote
 
         binding.imageBack.setOnClickListener {
             findNavController().popBackStack()
         }
-
-        binding.textDateTime.text = SimpleDateFormat(
-            "EEE, dd MMMM yyyy HH:hh a",
-            Locale.getDefault()
-        )
-            .format(Date())
 
         binding.imageSave.setOnClickListener {
             if (saveNote()) {
@@ -136,9 +137,9 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             noteText = binding.inputNote.text.toString()
             dateTime = binding.textDateTime.text.toString()
             color = selectedNoteColor
-            imagePath = imagePath ?: ""
-            webLink = binding.textWebUrl.text.toString() ?: ""
+            webLink = binding.textWebUrl.text.toString()
         }
+        binding.invalidateAll()
     }
 
     private fun initMiscellaneous() {
@@ -146,6 +147,12 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         bottomSheetBehavior = BottomSheetBehavior.from(layoutMiscellaneous)
         binding.includeMiscellaneous.textMiscellaneous.setOnClickListener {
             if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
+                when (currentNote.color) {
+                    "#FDBE3B" -> binding.includeMiscellaneous.imageColor2.performClick()
+                    "#FF4842" -> binding.includeMiscellaneous.imageColor3.performClick()
+                    "#3A52FC" -> binding.includeMiscellaneous.imageColor4.performClick()
+                    "#000000" -> binding.includeMiscellaneous.imageColor5.performClick()
+                }
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             } else {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -227,16 +234,11 @@ class AddNoteFragment : Fragment(), EasyPermissions.PermissionCallbacks {
             showDeleteNoteDialog()
         }
 
-        when (currentNote.color) {
-            "#FDBE3B" -> binding.includeMiscellaneous.imageColor2.performClick()
-            "#FF4842" -> binding.includeMiscellaneous.imageColor3.performClick()
-            "#3A52FC" -> binding.includeMiscellaneous.imageColor4.performClick()
-            "#000000" -> binding.includeMiscellaneous.imageColor5.performClick()
-        }
+
     }
 
     private fun setSubtitleIndicatorColor() {
-        currentNote.color = selectedNoteColor
+        updateCurrentNote()
         binding.invalidateAll()
     }
 

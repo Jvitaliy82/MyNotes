@@ -1,13 +1,10 @@
 package com.jdeveloperapps.noteapp.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jdeveloperapps.noteapp.R
 import com.jdeveloperapps.noteapp.databinding.ItemContainerNoteBinding
