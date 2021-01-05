@@ -5,30 +5,39 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.jdeveloperapps.noteapp.R
 import com.jdeveloperapps.noteapp.databinding.ItemContainerNoteBinding
 import com.jdeveloperapps.noteapp.entities.Note
 
-class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>(), Filterable {
-
-    private var currentList = listOf<Note>()
-    private var fullList = mutableListOf<Note>()
+class NotesAdapter : ListAdapter<Note, NotesAdapter.NotesViewHolder>(DiffCallback()) {
 
     private var onItemClickListener: ((note: Note) -> Unit)? = null
 
-    class NotesViewHolder(val binding: ItemContainerNoteBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    inner class NotesViewHolder(val binding: ItemContainerNoteBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            binding.root.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClickListener?.let {
+                        val note = getItem(position)
+                        it(note)
+                    }
+                }
+            }
+        }
+
+        fun bind(note: Note) {
+            binding.noteItem = note
+        }
+    }
 
     fun setOnClickListener(listener: (note: Note) -> Unit) {
         onItemClickListener = listener
-    }
-
-    fun submitList(listUserItem: List<Note>) {
-        currentList = listUserItem
-        fullList.clear()
-        fullList.addAll(listUserItem)
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
@@ -40,46 +49,16 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>(), Filte
 
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
         val currentItem = currentList[position]
-        holder.binding.apply {
-            noteItem = currentItem
-            root.setOnClickListener {
-                onItemClickListener?.let {
-                    it(currentItem)
-                }
-            }
-        }
+        holder.bind(currentItem)
     }
 
-    override fun getItemCount() = currentList.size
+    class DiffCallback : DiffUtil.ItemCallback<Note>() {
+        override fun areItemsTheSame(oldItem: Note, newItem: Note) =
+            oldItem.id == newItem.id
 
-    override fun getFilter(): Filter {
-        return object : Filter() {
-            override fun performFiltering(charSequence: CharSequence?): FilterResults {
-                var filteredList = mutableListOf<Note>()
-                if (charSequence.isNullOrEmpty()) {
-                    filteredList.addAll(fullList)
-                } else {
-                    val filterPattern = charSequence.toString().trim()
-                    filteredList = fullList.filter { note ->
-                        note.title.contains(filterPattern, ignoreCase = true) ||
-                                note.subtitle.contains(filterPattern, ignoreCase = true) ||
-                                note.noteText.contains(filterPattern, ignoreCase = true)
-                    }.toMutableList()
-                }
 
-                val filterResults = FilterResults()
-                filterResults.values = filteredList
-                return filterResults
-            }
+        override fun areContentsTheSame(oldItem: Note, newItem: Note) =
+            oldItem == newItem
 
-            override fun publishResults(p0: CharSequence?, filteredResults: FilterResults?) {
-                filteredResults?.let {
-                    currentList = filteredResults.values as List<Note>
-                }
-                notifyDataSetChanged()
-            }
-
-        }
     }
-
 }

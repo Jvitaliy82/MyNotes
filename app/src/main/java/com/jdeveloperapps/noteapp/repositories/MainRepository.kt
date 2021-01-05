@@ -4,13 +4,13 @@ import com.jdeveloperapps.noteapp.database.NoteDao
 import com.jdeveloperapps.noteapp.entities.Note
 import javax.inject.Inject
 
-class MainRepository @Inject constructor(val db: NoteDao) {
+class MainRepository @Inject constructor(private val db: NoteDao) {
 
     suspend fun saveNote(note: Note) {
         db.insertNote(note)
     }
 
-    fun getSaveNotes() = db.getAll()
+    fun getNotes(search: String) = db.getAll(search)
 
     suspend fun deleteNote(note: Note) {
         db.deleteNote(note)

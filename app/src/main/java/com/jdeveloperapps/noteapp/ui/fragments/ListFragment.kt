@@ -58,11 +58,8 @@ class ListFragment : Fragment() {
             }
         }
 
-        viewModel.getSaveNotes().observe(viewLifecycleOwner, {
+        viewModel.notes.observe(viewLifecycleOwner, {
             notesAdapter.submitList(it)
-            binding.inputSearch.text?.let { searchText ->
-                notesAdapter.filter.filter(searchText.toString())
-            }
         })
 
         binding.inputSearch.addTextChangedListener(object : TextWatcher {
@@ -72,7 +69,7 @@ class ListFragment : Fragment() {
 
             override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 charSequence?.let {
-                    notesAdapter.filter.filter(it)
+                    viewModel.searchQuery.value = it.toString()
                 }
             }
 
