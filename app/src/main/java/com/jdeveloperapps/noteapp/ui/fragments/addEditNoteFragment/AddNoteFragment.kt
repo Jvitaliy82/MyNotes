@@ -271,7 +271,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), EasyPermissions.Pe
                 viewModel.imagePath = getPathFromUri(it)
                 binding.imageRemoveImage.isVisible = true
                 binding.imageNote.isVisible = true
-                binding.imageNote.load(getPathFromUri(it))
+                binding.imageNote.load(Uri.fromFile(File(viewModel.imagePath)))
             }
         }
     }
