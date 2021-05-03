@@ -3,15 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
-        <import type="android.view.View" />
-
-        <import type="android.text.TextUtils" />
-
         <variable
             name="note"
             type="com.jdeveloperapps.noteapp.entities.Note" />
-
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -85,7 +79,6 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/ubuntu_regular"
                     android:includeFontPadding="false"
-                    android:text="@{note.dateTime}"
                     android:textColor="@color/colorIcons"
                     android:textSize="@dimen/_10ssp"
                     app:layout_constraintEnd_toEndOf="@id/inputNoteTitle"
@@ -107,7 +100,6 @@
                     android:inputType="textMultiLine"
                     android:paddingTop="@dimen/_8sdp"
                     android:paddingBottom="@dimen/_8sdp"
-                    android:text="@{note.subtitle}"
                     android:textColor="@color/colorTextSubtitle"
                     android:textColorHint="@color/colorTextHint"
                     android:textSize="@dimen/_13ssp"
@@ -121,7 +113,6 @@
                     android:layout_height="0dp"
                     android:layout_marginStart="@dimen/_12sdp"
                     android:background="@drawable/background_subtitle_indicator"
-                    android:colorBackground="@{note.color}"
                     app:layout_constraintBottom_toBottomOf="@id/inputNodeSubtitle"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@id/inputNodeSubtitle" />
@@ -135,8 +126,6 @@
                     android:layout_marginEnd="@dimen/_12sdp"
                     android:adjustViewBounds="true"
                     android:contentDescription="@string/app_name"
-                    android:loadImage="@{note.imagePath}"
-                    android:visibility="@{TextUtils.isEmpty(note.imagePath) ? View.GONE : View.VISIBLE}"
                     app:layout_constraintTop_toBottomOf="@id/inputNodeSubtitle" />
 
                 <ImageView
@@ -149,7 +138,6 @@
                     android:contentDescription="@string/app_name"
                     android:padding="@dimen/_4sdp"
                     android:src="@drawable/ic_delete"
-                    android:visibility="@{TextUtils.isEmpty(note.imagePath)  ? View.GONE : View.VISIBLE}"
                     app:layout_constraintEnd_toEndOf="@id/imageNote"
                     app:layout_constraintTop_toTopOf="@id/imageNote"
                     app:tint="@color/white" />
@@ -163,7 +151,6 @@
                     android:layout_marginEnd="@dimen/_12sdp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:visibility="@{TextUtils.isEmpty(note.webLink) ? View.GONE : View.VISIBLE}"
                     app:layout_constraintTop_toBottomOf="@id/imageNote">
 
                     <TextView
@@ -174,7 +161,6 @@
                         android:autoLink="web"
                         android:fontFamily="@font/ubuntu_regular"
                         android:includeFontPadding="false"
-                        android:text="@{note.webLink}"
                         android:textSize="@dimen/_13ssp" />
 
                     <ImageView
@@ -188,7 +174,7 @@
                 </LinearLayout>
 
                 <EditText
-                    android:id="@+id/inputNote"
+                    android:id="@+id/inputNoteText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_12sdp"
@@ -203,7 +189,6 @@
                     android:includeFontPadding="false"
                     android:inputType="textMultiLine"
                     android:minHeight="@dimen/_100sdp"
-                    android:text="@{note.noteText}"
                     android:textColor="@color/white"
                     android:textColorHint="@color/colorTextHint"
                     android:textSize="@dimen/_13ssp"

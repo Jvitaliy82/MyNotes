@@ -19,5 +19,7 @@
     <string name="delete_note">Delete Note</string>
     <string name="delete_note_question">Delete Note?</string>
     <string name="delete">Delete</string>
+    <string name="note_added">Note added</string>
+    <string name="note_updated">Note updated</string>
 
 </resources>

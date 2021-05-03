@@ -5,15 +5,6 @@
 
     <data>
 
-        <import type="android.graphics.Color" />
-
-        <import type="android.text.TextUtils" />
-
-        <import type="android.view.View" />
-
-        <variable
-            name="noteItem"
-            type="com.jdeveloperapps.noteapp.entities.Note" />
     </data>
 
     <LinearLayout
@@ -23,7 +14,6 @@
         android:layout_marginStart="@dimen/_12sdp"
         android:layout_marginTop="@dimen/_12sdp"
         android:background="@drawable/background_note"
-        android:colorBackground="@{noteItem.color}"
         android:orientation="vertical">
 
         <com.makeramen.roundedimageview.RoundedImageView
@@ -31,7 +21,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:loadImage="@{noteItem.imagePath}"
             app:riv_corner_radius_top_left="@dimen/_10sdp"
             app:riv_corner_radius_top_right="@dimen/_10sdp" />
 
@@ -44,7 +33,6 @@
             android:layout_marginEnd="@dimen/_8sdp"
             android:fontFamily="@font/ubuntu_bold"
             android:includeFontPadding="false"
-            android:text="@{noteItem.title}"
             android:textColor="@color/white"
             android:textSize="@dimen/_13ssp"
             tools:text="Name note" />
@@ -59,7 +47,6 @@
             android:layout_marginBottom="@dimen/_4sdp"
             android:fontFamily="@font/ubuntu_regular"
             android:includeFontPadding="false"
-            android:text="@{noteItem.subtitle}"
             android:textColor="@color/colorNoteSubtitleText"
             android:textSize="@dimen/_12ssp"
             tools:text="Subtitle note" />
@@ -73,7 +60,6 @@
             android:layout_marginBottom="@dimen/_8sdp"
             android:fontFamily="@font/ubuntu_regular"
             android:includeFontPadding="false"
-            android:text="@{noteItem.dateTime}"
             android:textColor="@color/colorNoteSubtitleText"
             android:textSize="@dimen/_7ssp"
             tools:text="11.12.2020" />

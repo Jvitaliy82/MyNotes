@@ -1,49 +1,53 @@
 package com.jdeveloperapps.noteapp.adapters
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.jdeveloperapps.noteapp.R
+import coil.load
 import com.jdeveloperapps.noteapp.databinding.ItemContainerNoteBinding
 import com.jdeveloperapps.noteapp.entities.Note
+import java.io.File
 
-class NotesAdapter : ListAdapter<Note, NotesAdapter.NotesViewHolder>(DiffCallback()) {
+class NotesAdapter(private val listener: OnItemClickListener) :
+    ListAdapter<Note, NotesAdapter.NotesViewHolder>(DiffCallback()) {
 
-    private var onItemClickListener: ((note: Note) -> Unit)? = null
-
-    inner class NotesViewHolder(val binding: ItemContainerNoteBinding) :
+    inner class NotesViewHolder(private val binding: ItemContainerNoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
             binding.root.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    onItemClickListener?.let {
-                        val note = getItem(position)
-                        it(note)
-                    }
+                    val note = getItem(position)
+                    listener.onItemClick(note)
                 }
             }
         }
 
         fun bind(note: Note) {
-            binding.noteItem = note
+            binding.apply {
+                val gradientDrawable = layoutNote.background as GradientDrawable
+                gradientDrawable.setColor(Color.parseColor(note.color))
+
+                imageNote.load(Uri.fromFile(File(note.imagePath)))
+                textTitle.text = note.title
+                textSubtitle.text = note.subtitle
+                textDateTime.text = note.createDateFormattedString
+            }
         }
     }
 
-    fun setOnClickListener(listener: (note: Note) -> Unit) {
-        onItemClickListener = listener
+    interface OnItemClickListener {
+        fun onItemClick(note: Note)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding: ItemContainerNoteBinding =
-            DataBindingUtil.inflate(layoutInflater, R.layout.item_container_note, parent, false)
+        val binding = ItemContainerNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return NotesViewHolder(binding)
     }
 

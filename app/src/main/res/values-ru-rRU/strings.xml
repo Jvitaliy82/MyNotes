@@ -20,4 +20,6 @@
     <string name="delete_note">Удалить заметку</string>
     <string name="delete_note_question">Удалить заметку?</string>
     <string name="delete">Удалить</string>
+    <string name="note_added">Заметка добавленна</string>
+    <string name="note_updated">Заметка обновленна</string>
 </resources>

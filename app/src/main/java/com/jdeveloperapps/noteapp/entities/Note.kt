@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
+import java.text.DateFormat
 
 @Entity(tableName = "notes")
 data class Note (
@@ -12,26 +13,29 @@ data class Note (
     val id: Int? = null,
 
     @ColumnInfo(name = "title")
-    var title: String = "",
+    val title: String = "",
 
     @ColumnInfo(name = "date_time")
-    var dateTime: String = "",
+    val dateTime: Long = System.currentTimeMillis(),
 
     @ColumnInfo(name = "subtitle")
-    var subtitle: String = "",
+    val subtitle: String = "",
 
     @ColumnInfo(name = "note_text")
-    var noteText: String = "",
+    val noteText: String = "",
 
     @ColumnInfo(name = "image_path")
-    var imagePath: String = "",
+    val imagePath: String = "",
 
     @ColumnInfo(name = "color")
-    var color: String = "#333333",
+    val color: String = "#333333",
 
     @ColumnInfo(name = "web_link")
-    var webLink: String = ""
+    val webLink: String = ""
 ) : Serializable {
+    val createDateFormattedString: String
+    get() = DateFormat.getDateInstance().format(dateTime)
+
     override fun toString(): String {
         return "$title : $dateTime"
     }
